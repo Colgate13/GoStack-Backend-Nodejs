@@ -18,7 +18,7 @@ app.post("/projects", (request, response) => {
   const { title } = request.body;
 
   const owener_body = request.body.owner;
-  console.log(body)
+  console.log(body);
 
   return response.json({ body: body, "Title": `${title}`, 'Owner': `${owener_body}`  })
 })
