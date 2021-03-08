@@ -1,5 +1,5 @@
 const express = require('express');
-const { uuid } = require("uuidv4");
+const { uuid, isUuid } = require("uuidv4");
 
 const app = express();
 
@@ -8,8 +8,38 @@ app.use(express.json());
 
 const projects = [];
 
+function logRequests(request, response, next)
+{
 
+   const { method, url } = request;
+
+   const logLabel = `[${method.toUpperCase()}] ${url}`;
+   console.time(logLabel)//Console.time conta o tempo de um console.log para outro
+    
+   next();
+    console.timeEnd(logLabel);
+
+}
+
+function validateProjectId(request, response, next)
+{
+    const { id } = request.params;
+    if(!isUuid(id))
+    {
+      return response.status(400).json({ error: 'Invalid project ID.'})
+    }
+    
+    return next()
+
+}
+//criando um Middleware para todas as rotas, para rotas individuais fazer igual no comentario a baixo
+app.use(logRequests);
+app.use('/projects/:id', validateProjectId)// Uma maneria de passar um Middleware so para uma rota
+
+//app.get("/projects", logRequests, Middleware1, Middleware2 (request, response) => {
+//Podemos colocar Middleware diretamente nas rotas e quantos Middleware quisermos
 app.get("/projects", (request, response) => {
+
   const {title } = request.query;
 
   const results = title
@@ -67,5 +97,6 @@ app.delete("/projects/:id", (request, response) => {
 
   return response.status(204).send()
 })
+
 app.listen(3330, () => console.log("🧛‍♀️ > Server is running! 🧡Eu amo a Lili💖"));
  
